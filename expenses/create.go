@@ -15,9 +15,9 @@ func (h *handler) CreateExpense(c *gin.Context) {
 		return
 	}
 
-	db := h.DB
 	sqlStatement := `INSERT INTO expenses (title, amount, note, tags) VALUES ($1, $2, $3, $4) RETURNING id`
-	_, err := db.Exec(sqlStatement, expense.Title, expense.Amount, expense.Note, pq.Array(expense.Tags))
+	row := h.DB.QueryRow(sqlStatement, expense.Title, expense.Amount, expense.Note, pq.Array(expense.Tags))
+	err := row.Scan(&expense.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Err{Message: err.Error()})
 		return
