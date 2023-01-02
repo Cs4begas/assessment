@@ -12,10 +12,12 @@ import (
 
 func main() {
 	fmt.Println("Please use server.go for main file")
-	expenses.InitDB()
+	db := expenses.InitDB()
+
+	h := expenses.NewApplication(db)
 
 	router := gin.Default()
-	router.POST("/expenses", expenses.CreateExpense)
+	router.POST("/expenses", h.CreateExpense)
 
 	os_port := os.Getenv("PORT")
 	fmt.Println("start at port:", os_port)

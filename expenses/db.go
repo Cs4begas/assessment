@@ -8,7 +8,14 @@ import (
 
 var Db *sql.DB
 
-func InitDB() {
+type handler struct {
+	DB *sql.DB
+}
+
+func NewApplication(db *sql.DB) *handler {
+	return &handler{db}
+}
+func InitDB() *sql.DB {
 	Db = connectDB()
 	// Create table
 	createTb := `CREATE TABLE IF NOT EXISTS expenses (
@@ -23,7 +30,7 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("can't create table", err)
 	}
-
+	return Db
 }
 
 func connectDB() (db *sql.DB) {
@@ -35,8 +42,4 @@ func connectDB() (db *sql.DB) {
 		log.Fatal("Connect to database error", err)
 	}
 	return db
-}
-
-func GetDB() *sql.DB {
-	return Db
 }
