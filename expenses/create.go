@@ -1,7 +1,6 @@
 package expenses
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,6 @@ func (h *handler) CreateExpense(c *gin.Context) {
 	expense := Expense{}
 
 	if err := c.ShouldBindJSON(&expense); err != nil {
-		log.Println("Hello")
 		c.AbortWithStatusJSON(http.StatusBadRequest, Err{Message: err.Error()})
 		return
 	}
