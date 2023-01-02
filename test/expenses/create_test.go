@@ -24,7 +24,8 @@ func TestCreateExpense(t *testing.T) {
 	router := gin.Default()
 	router.POST("/expenses", h.CreateExpense)
 
-	mock.ExpectExec("INSERT INTO expenses").WithArgs("grocery", 20.5, "food", pq.Array([]string{"food", "grocery"})).WillReturnResult(sqlmock.NewResult(1, 1))
+	rs1 := sqlmock.NewRows([]string{"id"}).AddRow(1)
+	mock.ExpectQuery("INSERT INTO expenses").WithArgs("grocery", 20.5, "food", pq.Array([]string{"food", "grocery"})).WillReturnRows(rs1)
 
 	tests := []struct {
 		name string

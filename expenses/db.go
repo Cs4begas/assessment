@@ -6,8 +6,6 @@ import (
 	"os"
 )
 
-var Db *sql.DB
-
 type handler struct {
 	DB *sql.DB
 }
@@ -16,7 +14,7 @@ func NewApplication(db *sql.DB) *handler {
 	return &handler{db}
 }
 func InitDB() *sql.DB {
-	Db = connectDB()
+	db := connectDB()
 	// Create table
 	createTb := `CREATE TABLE IF NOT EXISTS expenses (
 		id SERIAL PRIMARY KEY,
@@ -25,12 +23,12 @@ func InitDB() *sql.DB {
 		note TEXT,
 		tags TEXT[]
 	);`
-	_, err := Db.Exec(createTb)
+	_, err := db.Exec(createTb)
 
 	if err != nil {
 		log.Fatal("can't create table", err)
 	}
-	return Db
+	return db
 }
 
 func connectDB() (db *sql.DB) {
