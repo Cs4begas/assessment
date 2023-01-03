@@ -7,7 +7,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func (h *handler) CreateExpense(c *gin.Context) {
+func (h *Handler) CreateExpense(c *gin.Context) {
 	expense := Expense{}
 
 	if err := c.ShouldBindJSON(&expense); err != nil {
