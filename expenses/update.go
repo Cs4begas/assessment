@@ -1,7 +1,6 @@
 package expenses
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,6 @@ func (h *handler) UpdateExpenseById(c *gin.Context) {
 	sqlStatement := `UPDATE expenses SET title=$1, amount=$2, note=$3, tags=$4 WHERE id=$5`
 	_, err := h.DB.Exec(sqlStatement, expense.Title, expense.Amount, expense.Note, pq.Array(expense.Tags), id)
 	if err != nil {
-		fmt.Printf("Error: %s", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, Err{Message: err.Error()})
 		return
 	}
