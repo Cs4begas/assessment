@@ -24,6 +24,7 @@ func main() {
 	router.POST("/expenses", h.CreateExpense)
 	router.GET("/expenses/:id", h.GetExpenseById)
 	router.PUT("/expenses/:id", h.UpdateExpenseById)
+	router.GET("/expenses", h.GetAllExpenses)
 	os_port := os.Getenv("PORT")
 	fmt.Println("start at port:", os_port)
 	log.Fatal(router.Run(":" + os_port))
