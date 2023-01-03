@@ -6,12 +6,12 @@ import (
 	"os"
 )
 
-type handler struct {
+type Handler struct {
 	DB *sql.DB
 }
 
-func NewApplication(db *sql.DB) *handler {
-	return &handler{db}
+func NewApplication(db *sql.DB) *Handler {
+	return &Handler{db}
 }
 func InitDB() *sql.DB {
 	db := connectDB()

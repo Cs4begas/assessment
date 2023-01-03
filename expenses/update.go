@@ -7,7 +7,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func (h *handler) UpdateExpenseById(c *gin.Context) {
+func (h *Handler) UpdateExpenseById(c *gin.Context) {
 	var expense Expense
 	id := c.Param("id")
 	if err := c.ShouldBindJSON(&expense); err != nil {

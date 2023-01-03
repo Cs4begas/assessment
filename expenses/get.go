@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func (h *handler) GetExpenseById(c *gin.Context) {
+func (h *Handler) GetExpenseById(c *gin.Context) {
 	var expense Expense
 	id := c.Param("id")
 	row := h.DB.QueryRow("SELECT * FROM expenses WHERE id=$1", id)
@@ -25,7 +25,7 @@ func (h *handler) GetExpenseById(c *gin.Context) {
 	c.JSON(http.StatusOK, expense)
 }
 
-func (h *handler) GetAllExpenses(c *gin.Context) {
+func (h *Handler) GetAllExpenses(c *gin.Context) {
 	var expenses []Expense
 	rows, err := h.DB.Query("SELECT * FROM expenses")
 	if err != nil {
