@@ -1,6 +1,7 @@
 package expenses
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -9,11 +10,10 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetExpenseById(t *testing.T) {
+func TestUpdateExpenseById(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -23,30 +23,27 @@ func TestGetExpenseById(t *testing.T) {
 
 	h := NewApplication(db)
 
-	rows := sqlmock.NewRows([]string{"id", "title", "amount", "note", "tags"}).
-		AddRow(1, "Groceries", 100, "Food for the week", pq.Array([]string{"food", "necessities"}))
-
-	mock.ExpectQuery("SELECT (.+) FROM expenses").WithArgs("1").WillReturnRows(rows)
+	mock.ExpectExec("UPDATE expenses SET").WillReturnResult(sqlmock.NewResult(1, 1))
 
 	rr := httptest.NewRecorder()
 
 	c, _ := gin.CreateTestContext(rr)
-	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	jsonReq := `{"title":"apple smoothie","amount":89,"note":"no discount","tags":["beverage"]}`
+	c.Request, _ = http.NewRequest("PUT", "/expenses/1", bytes.NewBufferString(jsonReq))
 
-	h.GetExpenseById(c)
+	h.UpdateExpenseById(c)
 
 	assert.Equal(t, http.StatusOK, c.Writer.Status())
 	var expense Expense
 	json.Unmarshal(rr.Body.Bytes(), &expense)
-	assert.Equal(t, 1, expense.ID)
-	assert.Equal(t, "Groceries", expense.Title)
-	assert.EqualValues(t, 100, expense.Amount)
-	assert.Equal(t, "Food for the week", expense.Note)
-	assert.Equal(t, []string{"food", "necessities"}, expense.Tags)
+	assert.Equal(t, "apple smoothie", expense.Title)
+	assert.EqualValues(t, 89, expense.Amount)
+	assert.Equal(t, "no discount", expense.Note)
+	assert.Equal(t, []string{"beverage"}, expense.Tags)
 
 }
 
-func TestGetExpenseByIdNotFound(t *testing.T) {
+func TestUpdateExpenseByIdFail(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -56,42 +53,41 @@ func TestGetExpenseByIdNotFound(t *testing.T) {
 
 	h := NewApplication(db)
 
-	mock.ExpectQuery("SELECT (.+) FROM expenses").WithArgs("1").WillReturnError(sql.ErrNoRows)
+	mock.ExpectExec("UPDATE expenses SET").WillReturnError(sql.ErrNoRows)
 
 	rr := httptest.NewRecorder()
 
 	c, _ := gin.CreateTestContext(rr)
-	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+	jsonReq := `{"title":"apple smoothie","amount":89,"note":"no discount","tags":["beverage"]}`
+	c.Request, _ = http.NewRequest("PUT", "/expenses/1", bytes.NewBufferString(jsonReq))
 
-	h.GetExpenseById(c)
-
-	assert.Equal(t, http.StatusNotFound, c.Writer.Status())
-	var errResp Err
-	json.Unmarshal(rr.Body.Bytes(), &errResp)
-	assert.Equal(t, "Not found expense", errResp.Message)
-
-}
-
-func TestGetExpenseByIdError(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-
-	h := NewApplication(db)
-
-	mock.ExpectQuery("SELECT (.+) FROM expenses").WithArgs("1").WillReturnError(sql.ErrConnDone)
-
-	rr := httptest.NewRecorder()
-
-	c, _ := gin.CreateTestContext(rr)
-	c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
-
-	h.GetExpenseById(c)
+	h.UpdateExpenseById(c)
 
 	assert.Equal(t, http.StatusInternalServerError, c.Writer.Status())
+	var errResp Err
+	json.Unmarshal(rr.Body.Bytes(), &errResp)
+	assert.NotNil(t, errResp.Message)
+}
+
+func TestUpdateExpenseInvalidJson(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	h := NewApplication(db)
+
+	rr := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(rr)
+	jsonReq := `{"title":"apple smoothie","amount":89,"note":"no discount","tags":["beverage"]`
+	c.Request, _ = http.NewRequest("PUT", "/expenses/1", bytes.NewBufferString(jsonReq))
+
+	h.UpdateExpenseById(c)
+
+	assert.Equal(t, http.StatusBadRequest, c.Writer.Status())
 	var errResp Err
 	json.Unmarshal(rr.Body.Bytes(), &errResp)
 	assert.NotNil(t, errResp.Message)
