@@ -1,1 +1,0 @@
-command : DATABASE_URL=postgres://vmgwwcfs:h1SnYCJMWCfmiJ_vbx3tE-ZN3H0rcMTk@rosie.db.elephantsql.com/vmgwwcfs PORT=2565 go run server.go
