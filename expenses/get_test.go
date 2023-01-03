@@ -96,26 +96,3 @@ func TestGetExpenseByIdError(t *testing.T) {
 	json.Unmarshal(rr.Body.Bytes(), &errResp)
 	assert.NotNil(t, errResp.Message)
 }
-
-func TestGetExpenseByIdInvalidParam(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	db, _, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	defer db.Close()
-
-	h := NewApplication(db)
-
-	rr := httptest.NewRecorder()
-
-	c, _ := gin.CreateTestContext(rr)
-	c.Params = gin.Params{gin.Param{Key: "id", Value: ""}}
-
-	h.GetExpenseById(c)
-
-	assert.Equal(t, http.StatusBadRequest, c.Writer.Status())
-	var errResp Err
-	json.Unmarshal(rr.Body.Bytes(), &errResp)
-	assert.Equal(t, "param id is required", errResp.Message)
-}

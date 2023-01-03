@@ -11,10 +11,6 @@ import (
 func (h *handler) GetExpenseById(c *gin.Context) {
 	var expense Expense
 	id := c.Param("id")
-	if id == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, Err{Message: "param id is required"})
-		return
-	}
 	row := h.DB.QueryRow("SELECT * FROM expenses WHERE id=$1", id)
 	err := row.Scan(&expense.ID, &expense.Title, &expense.Amount, &expense.Note, pq.Array(&expense.Tags))
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/cs4begas/assessment/expenses"
@@ -17,6 +18,9 @@ func main() {
 	h := expenses.NewApplication(db)
 
 	router := gin.Default()
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Router not found"})
+	})
 	router.POST("/expenses", h.CreateExpense)
 	router.GET("/expenses/:id", h.GetExpenseById)
 
