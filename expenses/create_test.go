@@ -1,4 +1,4 @@
-package expenses_test
+package expenses
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/cs4begas/assessment/expenses"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ func TestCreateExpense(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	h := expenses.NewApplication(db)
+	h := NewApplication(db)
 	router := gin.Default()
 	router.POST("/expenses", h.CreateExpense)
 
