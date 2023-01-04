@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/cs4begas/assessment/expenses"
 	"github.com/cs4begas/assessment/middleware"
@@ -19,8 +23,30 @@ func main() {
 	h := expenses.NewApplication(db)
 	router := SetupRouter(h)
 	os_port := os.Getenv("PORT")
+
+	srv := &http.Server{
+		Addr:    ":" + os_port,
+		Handler: router,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
 	fmt.Println("start at port:", os_port)
-	log.Fatal(router.Run(":" + os_port))
+
+	// graceful shutdown
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	<-shutdown
+	fmt.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown :", err)
+	}
 }
 
 func SetupRouter(h *expenses.Handler) *gin.Engine {
