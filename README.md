@@ -8,7 +8,7 @@
     make unit-test
 ![alt](demo/unit-test.png)
 
-#### 4. Coverage Test
+### 4. Coverage Test
     make coverage-test
 ![alt](demo/coverage-test.png)
 # Prerequisites
