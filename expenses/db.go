@@ -6,15 +6,7 @@ import (
 	"os"
 )
 
-type Handler struct {
-	DB *sql.DB
-}
-
-func NewApplication(db *sql.DB) *Handler {
-	return &Handler{db}
-}
-func InitDB() *sql.DB {
-	db := connectDB()
+func InitDB(db *sql.DB) *sql.DB {
 	// Create table
 	createTb := `CREATE TABLE IF NOT EXISTS expenses (
 		id SERIAL PRIMARY KEY,
@@ -31,11 +23,11 @@ func InitDB() *sql.DB {
 	return db
 }
 
-func connectDB() (db *sql.DB) {
+func ConnectDB() *sql.DB {
 	var err error
 	db_url := os.Getenv("DATABASE_URL")
 	db_url += "?ssl.mode=disable"
-	db, err = sql.Open("postgres", db_url)
+	db, err := sql.Open("postgres", db_url)
 	if err != nil {
 		log.Fatal("Connect to database error", err)
 	}
