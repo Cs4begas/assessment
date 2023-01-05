@@ -1,0 +1,7 @@
+{
+    "gopls": {
+        "go.buildFlags": [
+            "-tags=unit,integration"
+        ]
+    }
+}
