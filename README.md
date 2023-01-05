@@ -1,3 +1,16 @@
+# วิธี Run project และ Test
+### 1. Start Project
+    make start-project
+### 2. Integration Test
+	make integration-test
+![alt](demo/integration-test.png)
+### 3. Unit Test
+    make unit-test
+![alt](demo/unit-test.png)
+
+#### 4. Coverage Test
+    make coverage-test
+![alt](demo/coverage-test.png)
 # Prerequisites
 * โปรเจคตั้งต้นคือ[โปรเจคนี้](https://github.com/KKGo-Software-engineering/assessment)
 * กำหนดให้ส่งลิ้งค์คำตอบคือ github repository ที่เก็บโค้ดของคุณ `https://github.com/<your github name>/assessment`
