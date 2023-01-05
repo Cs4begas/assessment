@@ -18,7 +18,8 @@ import (
 
 func main() {
 	fmt.Println("Please use server.go for main file")
-	db := expenses.InitDB()
+	db := expenses.ConnectDB()
+	expenses.InitDB(db)
 
 	h := expenses.NewApplication(db)
 	router := SetupRouter(h)
