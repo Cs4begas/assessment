@@ -15,7 +15,7 @@ RUN go build -o ./out/go-sample .
 # ====================
 
 
-FROM alpine:3.16.2
+FROM alpine:3.17
 COPY --from=build-base /app/out/go-sample /app/go-sample
 
 CMD ["/app/go-sample"]
